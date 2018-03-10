@@ -5,9 +5,13 @@ import java.net.HttpURLConnection;
 import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
 
+import android.content.Context;
+import android.app.ActivityManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+
+import com.facebook.react.bridge.ReactApplicationContext;
 
 /**
  * Created by dayudong on 08/03/2018.
@@ -22,6 +26,13 @@ public class Utils {
         Bitmap bitmap = getBitmapFromUrlString(urlString);
         Bitmap resizeBitmap = getResizeBitmapFromBitmap(bitmap, width, height);
         return transformBitmapToByteArray(resizeBitmap);
+    }
+
+    public static void moveCurrentActivityToTop(ReactApplicationContext context) throws NullPointerException {
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.moveTaskToFront(
+                context.getCurrentActivity().getTaskId(),
+                ActivityManager.MOVE_TASK_NO_USER_ACTION);
     }
 
     private static Bitmap getBitmapFromUrlString(String urlString) {

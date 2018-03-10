@@ -18,6 +18,7 @@ import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
+import com.tencent.mm.opensdk.modelmsg.ShowMessageFromWX;
 import com.tencent.mm.opensdk.modelmsg.WXTextObject;
 import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
 import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
@@ -165,7 +166,11 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
         api.handleIntent(intent, new IWXAPIEventHandler() {
             @Override
             public void onReq(BaseReq baseReq) {
-                // wechat send request to app
+                if (baseReq instanceof ShowMessageFromWX.Req) {
+                    try {
+                        Utils.moveCurrentActivityToTop(mReactContext);
+                    } catch (NullPointerException ignored) {}
+                }
             }
 
             @Override
