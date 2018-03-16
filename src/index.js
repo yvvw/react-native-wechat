@@ -72,6 +72,20 @@ let checkWechatEnable = async () => {
 }
 
 /**
+ * 注册微信
+ * @param  {String}  appId
+ * @param  {Boolean}  [isDebug=false}]
+ * @return {Promise}
+ */
+const registerApp = async ({
+  appId,
+  isDebug = false
+}) => {
+  const res = await RNWechat.registerApp(appId, isDebug ? 'true' : 'false')
+  return res === 'true'
+}
+
+/**
  * 发送授权请求
  * @param  {String}  appId              appId
  * @param  {String}  state              用于验证微信返回信息
@@ -182,6 +196,7 @@ const sendMiniProgramWebpageUrl = async ({
 }
 
 export default {
+  registerApp,
   sendAuthRequestScope,
   sendText,
   sendLinkURL,

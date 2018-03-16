@@ -1,4 +1,3 @@
-
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
 
@@ -12,7 +11,6 @@
 
 @interface RNWechat : RCTEventEmitter <RCTBridgeModule, WXApiDelegate>
 
-+ (void)registerApp:(NSString *)appId IsDebug:(BOOL)isDebug;
+@property (nonatomic) BOOL isWXApiRegisteSuccess;
 
 @end
-  

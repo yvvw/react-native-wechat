@@ -3,26 +3,25 @@ package com.ytanglib.wechat;
 import android.content.Intent;
 import android.util.Log;
 
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-
-import com.tencent.mm.opensdk.openapi.IWXAPI;
-import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
-import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.opensdk.modelmsg.ShowMessageFromWX;
-import com.tencent.mm.opensdk.modelmsg.WXTextObject;
 import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
-import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
 import com.tencent.mm.opensdk.modelmsg.WXMiniProgramObject;
+import com.tencent.mm.opensdk.modelmsg.WXTextObject;
+import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
 public class RNWechatModule extends ReactContextBaseJavaModule {
     private static ReactApplicationContext mReactContext;
@@ -31,12 +30,20 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
     private static IWXAPI api;
     private boolean isWXApiRegisteSuccess = false;
 
-    public RNWechatModule(ReactApplicationContext reactContext, String appId) {
+    public RNWechatModule(ReactApplicationContext reactContext) {
         super(reactContext);
         mReactContext = reactContext;
+    }
 
+    @Override
+    public String getName() {
+        return "RNWechat";
+    }
+
+    @ReactMethod
+    public void registerApp(String appId, String isDebug, Promise promise) {
         if (!appId.isEmpty()) {
-            api = WXAPIFactory.createWXAPI(reactContext, appId, true);
+            api = WXAPIFactory.createWXAPI(mReactContext, appId, true);
             isWXApiRegisteSuccess = api.registerApp(appId);
             if (isWXApiRegisteSuccess) {
                 Log.i(Tag, "WXApi register success. appId: " + appId);
@@ -47,12 +54,7 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
         } else {
             Log.i(Tag, "There is no appId for WXApi.");
         }
-
-    }
-
-    @Override
-    public String getName() {
-        return "RNWechat";
+        promise.resolve(getOperateResult(isWXApiRegisteSuccess));
     }
 
     @ReactMethod
@@ -70,8 +72,7 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
             String scope,
             String state,
             String openId,
-            Promise promise)
-    {
+            Promise promise) {
         final SendAuth.Req req = new SendAuth.Req();
         req.scope = scope;
         req.state = state;
@@ -84,12 +85,11 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
     public void sendText(
             String text,
             Integer sceneType,
-            Promise promise)
-    {
+            Promise promise) {
         WXTextObject textObject = new WXTextObject();
         textObject.text = text;
 
-        WXMediaMessage mediaMessage = getMediaMessageWithData(null,null,null, textObject);
+        WXMediaMessage mediaMessage = getMediaMessageWithData(null, null, null, textObject);
         promise.resolve(getOperateResult(sendMessageRequest(mediaMessage, sceneType)));
     }
 
@@ -100,8 +100,7 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
             String description,
             String thumbUrlString,
             Integer sceneType,
-            Promise promise)
-    {
+            Promise promise) {
         WXWebpageObject webObj = new WXWebpageObject();
         webObj.webpageUrl = urlString;
 
@@ -121,8 +120,7 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
             String thumbUrlString,
             String hdImageUrlString,
             Integer programType,
-            Promise promise)
-    {
+            Promise promise) {
         WXMiniProgramObject miniObj = new WXMiniProgramObject();
         miniObj.webpageUrl = webpageUrl;
         miniObj.userName = userName;
@@ -145,8 +143,7 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
             String title,
             String description,
             byte[] thumbData,
-            WXMediaMessage.IMediaObject mediaObject)
-    {
+            WXMediaMessage.IMediaObject mediaObject) {
         WXMediaMessage mediaMessage = new WXMediaMessage();
         mediaMessage.title = title;
         mediaMessage.description = description;
@@ -169,7 +166,8 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
                 if (baseReq instanceof ShowMessageFromWX.Req) {
                     try {
                         Utils.moveCurrentActivityToTop(mReactContext);
-                    } catch (NullPointerException ignored) {}
+                    } catch (NullPointerException ignored) {
+                    }
                 }
             }
 

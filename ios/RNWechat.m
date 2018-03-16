@@ -12,27 +12,6 @@ static NSString *const kOpenURLNotification = @"RCTOpenURLNotification";
 
 @implementation RNWechat
 
-static bool isWXApiRegisteSuccess = false;
-
-+ (void)registerApp:(NSString *)appId IsDebug:(BOOL)isDebug
-{
-    if(![appId isEqualToString:@""]) {
-        if (isDebug) {
-            [WXApi startLogByLevel:WXLogLevelDetail logBlock:^(NSString *log) {
-                NSLog(@"WXApi: %@", log);
-            }];
-        }
-        isWXApiRegisteSuccess = [WXApi registerApp:appId];
-        if (isWXApiRegisteSuccess) {
-            NSLog(@"WXApi register success. appId: %@", appId);
-        } else {
-            NSLog(@"WXApi register failed. appId: %@", appId);
-        }
-    } else {
-        NSLog(@"There is no appId for WXApi.");
-    }
-}
-
 + (NSString *)getOperateResult:(BOOL)isOperateSucc
 {
     return isOperateSucc ? RNWechatOperateSuccess : RNWechatOperateFailed;
@@ -44,6 +23,7 @@ RCT_EXPORT_MODULE()
 {
     self = [super init];
     if (self) {
+        _isWXApiRegisteSuccess = false;
         // observe RCTLinking push notification
         [[NSNotificationCenter defaultCenter]
                                         addObserver:self
@@ -85,11 +65,36 @@ RCT_EXPORT_MODULE()
 }
 
 #pragma react-native-methods
+RCT_REMAP_METHOD(registerApp,
+                 appId:(NSString *)appId
+                 isDebug:(NSString *)isDebug
+                 registerAppResolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    if(![appId isEqualToString:@""]) {
+        if ([isDebug isEqualToString:@"true"]) {
+            [WXApi startLogByLevel:WXLogLevelDetail logBlock:^(NSString *log) {
+                NSLog(@"WXApi: %@", log);
+            }];
+        }
+        _isWXApiRegisteSuccess = [WXApi registerApp:appId];
+        if (_isWXApiRegisteSuccess) {
+            NSLog(@"WXApi register success. appId: %@", appId);
+        } else {
+            NSLog(@"WXApi register failed. appId: %@", appId);
+        }
+    } else {
+        NSLog(@"There is no appId for WXApi.");
+    }
+
+    resolve([RNWechat getOperateResult:_isWXApiRegisteSuccess]);
+}
+
 RCT_REMAP_METHOD(isWXApiRegisteSuccess,
                  isWXApiRegisteSuccessWithResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-    resolve([RNWechat getOperateResult:isWXApiRegisteSuccess]);
+    resolve([RNWechat getOperateResult:_isWXApiRegisteSuccess]);
 }
 
 RCT_REMAP_METHOD(isWXAppInstalled,
@@ -241,4 +246,3 @@ RCT_REMAP_METHOD(sendMiniProgramWebpageUrl,
 }
 
 @end
-  
