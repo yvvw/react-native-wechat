@@ -1,18 +1,32 @@
 {
-  "name": "react-native-wechat",
-  "version": "1.0.2",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "name": "@yyyyu/react-native-wechat",
+  "author": "yyyyu <g592842897@gmail.com>",
+  "version": "2.0.0",
   "keywords": [
     "react-native",
     "wechat"
   ],
-  "author": "dongdayu",
+  "description": "react native for wechat.",
   "license": "MIT",
+  "homepage": "https://github.com/yyyyu/react-native-wechat",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:yyyyu/react-native-wechat.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "node scripts/postinstall"
+  },
+  "rnpm": {
+    "commands": {
+      "postlink": "node node_modules/@yyyyu/react-native-wechat/scripts/postlink"
+    }
+  },
   "peerDependencies": {
-    "react-native": "latest"
+    "react-native": ">0.50.0"
+  },
+  "devDependencies": {
+    "standard": "^11.0.1"
   }
 }

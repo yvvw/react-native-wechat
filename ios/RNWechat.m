@@ -1,5 +1,5 @@
 #import "RNWechat.h"
-#import "Utils.h"
+#import "FormatConversion.h"
 
 #define ASSIGN_EMPTY_STRING(assign, string) \
 if (string != nil) { \
@@ -8,28 +8,34 @@ if (string != nil) { \
     assign = @""; \
 }
 
-static NSString *const kOpenURLNotification = @"RCTOpenURLNotification";
-
-@implementation RNWechat
-
-+ (NSString *)getOperateResult:(BOOL)isOperateSucc
-{
-    return isOperateSucc ? RNWechatOperateSuccess : RNWechatOperateFailed;
+@implementation RNWechat {
+    BOOL _isWXApiRegisteSuccess;
 }
 
 RCT_EXPORT_MODULE()
+
++ (BOOL)requiresMainQueueSetup
+{
+    return YES;
+}
+
+- (dispatch_queue_t)methodQueue
+{
+    return dispatch_get_main_queue();
+}
+
+
+#pragma lifecycle
 
 - (instancetype)init
 {
     self = [super init];
     if (self) {
-        _isWXApiRegisteSuccess = false;
-        // observe RCTLinking push notification
         [[NSNotificationCenter defaultCenter]
-                                        addObserver:self
-                                        selector:@selector(openURL:)
-                                        name:kOpenURLNotification
-                                        object:nil];
+                                addObserver:self
+                                   selector:@selector(openURL:)
+                                       name:kOpenURLNotification
+                                      object:nil];
     }
     return self;
 }
@@ -39,11 +45,264 @@ RCT_EXPORT_MODULE()
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (BOOL)openURL:(NSNotification *)aNotification
+
+#pragma 初始化
+
+RCT_REMAP_METHOD(registerApp,
+                    appId:(NSString *)anAppId
+                  isDebug:(BOOL)isDebug
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
 {
-    NSURL *aURL = [NSURL URLWithString:[aNotification userInfo][@"url"]];
-    return [WXApi handleOpenURL:aURL delegate:self];
+    if(![anAppId isEqualToString:@""]) {
+        if (isDebug) {
+            [WXApi startLogByLevel:WXLogLevelDetail
+                          logBlock:^(NSString *log) { NSLog(@"WXApi: %@", log); }];
+        }
+        _isWXApiRegisteSuccess = [WXApi registerApp:anAppId];
+        if (_isWXApiRegisteSuccess) {
+            NSLog(@"WXApi register success. appId: %@", anAppId);
+        } else {
+            NSLog(@"WXApi register failed. appId: %@", anAppId);
+        }
+    } else {
+        _isWXApiRegisteSuccess = NO;
+        NSLog(@"There is no appId for WXApi.");
+    }
+
+    resolve([self getResolveResFromBool:_isWXApiRegisteSuccess]);
 }
+
+RCT_REMAP_METHOD(isWXApiRegisteSuccess,
+                 isWXApiRegisteSuccessResolver:(RCTPromiseResolveBlock)resolve
+                                      rejecter:(RCTPromiseRejectBlock)reject)
+{
+    resolve([self getResolveResFromBool:_isWXApiRegisteSuccess]);
+}
+
+
+#pragma 基本信息
+
+RCT_REMAP_METHOD(isWXAppInstalled,
+                 isWXAppInstalledResolver:(RCTPromiseResolveBlock)resolve
+                                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    resolve([self getResolveResFromBool:[WXApi isWXAppInstalled]]);
+}
+
+RCT_REMAP_METHOD(isWXAppSupportApi,
+                 isWXAppSupportApiResolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    resolve([self getResolveResFromBool:[WXApi isWXAppSupportApi]]);
+}
+
+RCT_REMAP_METHOD(getWXAppInstallUrl,
+                 getWXAppInstallUrlResolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    resolve([WXApi getWXAppInstallUrl]);
+}
+
+
+#pragma 基本操作
+
+RCT_REMAP_METHOD(openWXApp,
+                 openWXAppResolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    resolve([self getResolveResFromBool:[WXApi openWXApp]]);
+}
+
+
+#pragma OAuth2
+
+RCT_REMAP_METHOD(sendAuthRequest,
+                  sendAuthRequestScope:(NSString *)aScope
+                                 state:(NSString *)aState
+                              resolver:(RCTPromiseResolveBlock)resolve
+                              rejecter:(RCTPromiseRejectBlock)reject)
+{
+    resolve([self getResolveResFromBool:[WXApiRequestHandler sendAuthRequestScope:aScope
+                                                                            State:aState]]);
+}
+
+
+#pragma Share
+
+RCT_REMAP_METHOD(sendText,
+                 sendText:(NSString *)aText
+                sceneType:(NSInteger *)aSceneType
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    resolve([self getResolveResFromBool:[WXApiRequestHandler sendText:aText
+                                                              InScene:(enum WXScene)aSceneType]]);
+}
+
+RCT_REMAP_METHOD(sendImage,
+                 sendImage:(NSString *)anImageString
+                 sceneType:(NSInteger *)aSceneType
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    NSData *anImageData = [FormatConversion stringToData:anImageString];
+    resolve([self getResolveResFromBool:[WXApiRequestHandler sendImage:anImageData
+                                                               InScene:(enum WXScene)aSceneType]]);
+}
+
+RCT_REMAP_METHOD(sendMusic,
+                 musicUrl:(NSString *)aMusicUrl
+             musicDataUrl:(NSString *)aMusicDataUrl
+                    title:(NSString *)aTitle
+              description:(NSString *)aDescription
+              thumbString:(NSString *)aThumbString
+                sceneType:(NSInteger *)aSceneType
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    NSData *aThumbData = [FormatConversion stringToData:aThumbString];
+    resolve([self getResolveResFromBool:[WXApiRequestHandler sendMusic:aMusicUrl
+                                                          musicDataUrl:aMusicDataUrl
+                                                                 title:aTitle
+                                                           description:aDescription
+                                                            thumbImage:aThumbData
+                                                               InScene:(enum WXScene)aSceneType]]);
+}
+
+RCT_REMAP_METHOD(sendVideo,
+                 videoUrl:(NSString *)aVideoUrl
+                 title:(NSString *)aTitle
+                 description:(NSString *)aDescription
+                 thumbString:(NSString *)aThumbString
+                 sceneType:(NSInteger *)aSceneType
+                 resolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject)
+{
+    NSData *aThumbData = [FormatConversion stringToData:aThumbString];
+    resolve([self getResolveResFromBool:[WXApiRequestHandler sendVideo:aVideoUrl
+                                                                 title:aTitle
+                                                           description:aDescription
+                                                            thumbImage:aThumbData
+                                                               InScene:(enum WXScene)aSceneType]]);
+}
+
+RCT_REMAP_METHOD(sendLink,
+                  sendLinkString:(NSString *)aLinkString
+                           title:(NSString *)aTitle
+                     description:(NSString *)aDescription
+                     thumbString:(NSString *)aThumbString
+                       sceneType:(NSInteger *)aSceneType
+                        resolver:(RCTPromiseResolveBlock)resolve
+                        rejecter:(RCTPromiseRejectBlock)reject)
+{
+    NSData *aThumbData = [FormatConversion stringToData:aThumbString];
+    resolve([self getResolveResFromBool:[WXApiRequestHandler sendLink:aLinkString
+                                                                title:aTitle
+                                                          description:aDescription
+                                                           thumbImage:aThumbData
+                                                              InScene:(enum WXScene)aSceneType]]);
+}
+
+RCT_REMAP_METHOD(sendMiniProgram,
+               sendMiniProgramUserName:(NSString *)anUserName
+                       miniProgramType:(NSInteger *)aMiniProgramType
+                                  path:(NSString *)aPath
+                         hdThumbString:(NSString *)aHdThumbString
+                                 title:(NSString *)aTitle
+                           description:(NSString *)aDescription
+                            webpageUrl:(NSString *)aWebpageUrl
+                           thumbString:(NSString *)aThumbString
+                              resolver:(RCTPromiseResolveBlock)resolve
+                              rejecter:(RCTPromiseRejectBlock)reject)
+{
+    // 小程序只支持会话分享
+    NSData *aThumbData = [FormatConversion stringToData:aThumbString];
+    NSData *aHdThumbData = [FormatConversion stringToData:aHdThumbString];
+    resolve([self getResolveResFromBool:[WXApiRequestHandler sendMiniProgram:anUserName
+                                                             miniProgramType:(WXMiniProgramType)aMiniProgramType
+                                                                        path:aPath
+                                                                hdThumbImage:aHdThumbData
+                                                                       title:aTitle
+                                                                 description:aDescription
+                                                                  webpageUrl:aWebpageUrl
+                                                                  thumbImage:aThumbData]]);
+}
+
+
+#pragma Pay
+
+RCT_REMAP_METHOD(pay,
+              payWithAppId:(NSString *)anAppId
+                 partnerId:(NSString *)aPartnerId
+                  prepayId:(NSString *)aPrepayId
+                  nonceStr:(NSString *)aNonceStr
+                 timeStamp:(nonnull NSNumber *)aTimeStamp
+                   package:(NSString *)aPackage
+                      sign:(NSString *)aSign
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+    resolve([self getResolveResFromBool:[WXApiRequestHandler pay:aPartnerId
+                                                        prepayId:aPrepayId
+                                                        nonceStr:aNonceStr
+                                                       timeStamp:[aTimeStamp unsignedIntValue]
+                                                         package:aPackage
+                                                            sign:aSign]]);
+}
+
+
+#pragma WXApiDelegate
+
+// 发送一个sendReq后，收到微信的回应
+- (void)onResp:(BaseResp *)resp {
+    NSMutableDictionary *body = @{}.mutableCopy;
+    body[@"errCode"] = @(resp.errCode);
+    ASSIGN_EMPTY_STRING(body[@"errStr"], resp.errStr)
+
+    if ([resp isKindOfClass:[SendAuthResp class]]) {
+        // 身份认证
+        SendAuthResp *authResp = (SendAuthResp *)resp;
+        body[@"eventType"] = @"SendAuthResp";
+        ASSIGN_EMPTY_STRING(body[@"code"], authResp.code)
+        ASSIGN_EMPTY_STRING(body[@"state"], authResp.state)
+        ASSIGN_EMPTY_STRING(body[@"lang"], authResp.lang)
+        ASSIGN_EMPTY_STRING(body[@"country"], authResp.country)
+    } else if ([resp isKindOfClass:[SendMessageToWXResp class]]) {
+        // 发送文字、图片、音乐、视频、链接、小程序
+        SendMessageToWXResp *messageResp = (SendMessageToWXResp *)resp;
+        body[@"eventType"] = @"SendMessageToWXResp";
+        ASSIGN_EMPTY_STRING(body[@"lang"], messageResp.lang)
+        ASSIGN_EMPTY_STRING(body[@"country"], messageResp.country)
+    } else if ([resp isKindOfClass:[PayResp class]]) {
+        // 支付
+        PayResp *payResp = (PayResp *)resp;
+        body[@"eventType"] = @"PayResp";
+        ASSIGN_EMPTY_STRING(body[@"returnKey"], payResp.returnKey);
+    }
+
+    [self sendEvent:body];
+}
+
+// 收到一个来自微信的请求，第三方应用程序处理完后调用sendResp向微信发送结果
+- (void)onReq:(BaseReq *)req {
+    // TODO: 收到微信请求，后续处理 可以自动打开，但是没有参数
+//    if ([req isKindOfClass:[GetMessageFromWXReq class]]) {
+//        GetMessageFromWXReq *getMessageReq = (GetMessageFromWXReq *)req;
+//    } else if ([req isKindOfClass:[ShowMessageFromWXReq class]]) {
+//        ShowMessageFromWXReq *showMessageReq = (ShowMessageFromWXReq *)req;
+//    } else if ([req isKindOfClass:[LaunchFromWXReq class]]) {
+//        LaunchFromWXReq *launchReq = (LaunchFromWXReq *)req;
+//    }
+}
+
+- (NSNumber *)getResolveResFromBool:(BOOL)boolValue
+{
+    return [NSNumber numberWithBool:boolValue];
+}
+
+
+#pragma event
 
 - (NSArray<NSString *> *)supportedEvents
 {
@@ -54,195 +313,13 @@ RCT_EXPORT_MODULE()
     [self sendEventWithName:RNWechatEventName body:body];
 }
 
-- (dispatch_queue_t)methodQueue
+
+#pragma wxapi handle url
+
+- (BOOL)openURL:(NSNotification *)aNotification
 {
-    return dispatch_get_main_queue();
-}
-
-+ (BOOL)requiresMainQueueSetup
-{
-    return YES;
-}
-
-#pragma react-native-methods
-RCT_REMAP_METHOD(registerApp,
-                 appId:(NSString *)appId
-                 isDebug:(NSString *)isDebug
-                 registerAppResolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
-{
-    if(![appId isEqualToString:@""]) {
-        if ([isDebug isEqualToString:@"true"]) {
-            [WXApi startLogByLevel:WXLogLevelDetail logBlock:^(NSString *log) {
-                NSLog(@"WXApi: %@", log);
-            }];
-        }
-        _isWXApiRegisteSuccess = [WXApi registerApp:appId];
-        if (_isWXApiRegisteSuccess) {
-            NSLog(@"WXApi register success. appId: %@", appId);
-        } else {
-            NSLog(@"WXApi register failed. appId: %@", appId);
-        }
-    } else {
-        NSLog(@"There is no appId for WXApi.");
-    }
-
-    resolve([RNWechat getOperateResult:_isWXApiRegisteSuccess]);
-}
-
-RCT_REMAP_METHOD(isWXApiRegisteSuccess,
-                 isWXApiRegisteSuccessWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
-{
-    resolve([RNWechat getOperateResult:_isWXApiRegisteSuccess]);
-}
-
-RCT_REMAP_METHOD(isWXAppInstalled,
-                 isWXAppInstalledWithResolver:(RCTPromiseResolveBlock)resolve
-                 rejecter:(RCTPromiseRejectBlock)reject)
-{
-    resolve([RNWechat getOperateResult:[WXApi isWXAppInstalled]]);
-}
-
-RCT_REMAP_METHOD(sendAuthRequestScope,
-                  sendAuthRequestScope:(NSString *)scope
-                  State:(NSString *)state
-                  OpenID:(NSString *)openID
-                  Resolver:(RCTPromiseResolveBlock)resolve
-                  Rejecter:(RCTPromiseRejectBlock)reject)
-{
-    resolve([RNWechat getOperateResult:[WXApiRequestHandler sendAuthRequestScope:scope State:state OpenID:openID]]);
-}
-
-RCT_REMAP_METHOD(sendText,
-                 sendText:(NSString *)text
-                 SceneType:(NSInteger)sceneType
-                 Resolver:(RCTPromiseResolveBlock)resolve
-                 Rejecter:(RCTPromiseRejectBlock)reject)
-{
-    resolve([RNWechat getOperateResult:[WXApiRequestHandler sendText:text InScene:(enum WXScene)sceneType]]);
-}
-
-RCT_REMAP_METHOD(sendLinkURL,
-                 sendLinkURL:(NSString *)urlString
-                 Title:(NSString *)title
-                 Description:(NSString *)description
-                 ThumbImageUrlString:(NSString *)thumbImageUrlString
-                 SceneType:(NSInteger)sceneType
-                 Resolver:(RCTPromiseResolveBlock)resolve
-                 Rejecter:(RCTPromiseRejectBlock)reject)
-{
-    UIImage *thumbImage = [Utils imageUrlString:thumbImageUrlString toImageWithSize:CGSizeMake(100.0, 100.0)];
-    resolve([RNWechat getOperateResult:[WXApiRequestHandler
-                                                      sendLinkURL:urlString
-                                                      TagName:@""
-                                                      Title:title
-                                                      Description:description
-                                                      ThumbImage:thumbImage
-                                                      InScene:(enum WXScene)sceneType ]]);
-}
-
-RCT_REMAP_METHOD(sendMiniProgramWebpageUrl,
-                 sendMiniProgramWebpageUrl:(NSString *)webpageUrl
-                 userName:(NSString *)userName
-                 path:(NSString *)path
-                 title:(NSString *)title
-                 Description:(NSString *)description
-                 ThumbImageUrlString:(NSString *)thumbImageUrlString
-                 hdImageUrlString:(NSString *)hdImageUrlString
-                 miniProgramType:(NSInteger)programType
-                 Resolver:(RCTPromiseResolveBlock)resolve
-                 Rejecter:(RCTPromiseRejectBlock)reject)
-{
-    // 小程序只支持会话分享
-    UIImage *thumbImage = [Utils imageUrlString:thumbImageUrlString toImageWithSize:CGSizeMake(100.0, 100.0)];
-    NSData *hdImageData = [Utils imageUrlStringToData:hdImageUrlString];
-    resolve([RNWechat getOperateResult:[WXApiRequestHandler
-                                        sendMiniProgramWebpageUrl:webpageUrl
-                                        userName:userName path:path
-                                        title:title
-                                        Description:description
-                                        ThumbImage:thumbImage
-                                        hdImageData:hdImageData
-                                        withShareTicket:YES
-                                        miniProgramType:(WXMiniProgramType)programType
-                                        InScene:WXSceneSession ]]);
-}
-
-#pragma mark - WXApiDelegate
-- (void)onResp:(BaseResp *)resp {
-    NSMutableDictionary *body = @{}.mutableCopy;
-    body[@"errCode"] = @(resp.errCode);
-    ASSIGN_EMPTY_STRING(body[@"errStr"], resp.errStr)
-
-    if ([resp isKindOfClass:[SendMessageToWXResp class]]) {
-        // 发送文字
-        SendMessageToWXResp *messageResp = (SendMessageToWXResp *)resp;
-        body[@"eventType"] = @"SendMessageToWXResp";
-        ASSIGN_EMPTY_STRING(body[@"lang"], messageResp.lang)
-        ASSIGN_EMPTY_STRING(body[@"country"], messageResp.country)
-    } else if ([resp isKindOfClass:[SendAuthResp class]]) {
-        // 发送验证请求
-        SendAuthResp *authResp = (SendAuthResp *)resp;
-        body[@"eventType"] = @"SendAuthResp";
-        ASSIGN_EMPTY_STRING(body[@"code"], authResp.code)
-        ASSIGN_EMPTY_STRING(body[@"state"], authResp.state)
-        ASSIGN_EMPTY_STRING(body[@"lang"], authResp.lang)
-        ASSIGN_EMPTY_STRING(body[@"country"], authResp.country)
-    } else if ([resp isKindOfClass:[AddCardToWXCardPackageResp class]]) {
-        // 添加卡片到卡包
-        AddCardToWXCardPackageResp *addCardResp = (AddCardToWXCardPackageResp *)resp;
-        body[@"eventType"] = @"AddCardToWXCardPackageResp";
-        ASSIGN_EMPTY_STRING(body[@"cardAry"], addCardResp.cardAry)
-    } else if ([resp isKindOfClass:[WXChooseCardResp class]]) {
-        // 选择卡片
-        WXChooseCardResp *chooseCardResp = (WXChooseCardResp *)resp;
-        body[@"eventType"] = @"WXChooseCardResp";
-        ASSIGN_EMPTY_STRING(body[@"cardAry"], chooseCardResp.cardAry)
-    } else if ([resp isKindOfClass:[WXChooseInvoiceResp class]]){
-        // 选择发票
-        WXChooseInvoiceResp *chooseInvoiceResp = (WXChooseInvoiceResp *)resp;
-        body[@"eventType"] = @"WXChooseInvoiceResp";
-        ASSIGN_EMPTY_STRING(body[@"cardAry"], chooseInvoiceResp.cardAry)
-    } else if ([resp isKindOfClass:[WXSubscribeMsgResp class]]){
-        // 订阅消息
-        WXSubscribeMsgResp *subscribeMsgResp = (WXSubscribeMsgResp *)resp;
-        body[@"eventType"] = @"WXSubscribeMsgResp";
-        ASSIGN_EMPTY_STRING(body[@"templateId"], subscribeMsgResp.templateId)
-        // subscribeMsgResp.scene
-        ASSIGN_EMPTY_STRING(body[@"action"], subscribeMsgResp.action)
-        ASSIGN_EMPTY_STRING(body[@"reserved"], subscribeMsgResp.reserved)
-        ASSIGN_EMPTY_STRING(body[@"openId"], subscribeMsgResp.openId)
-    } else if ([resp isKindOfClass:[WXLaunchMiniProgramResp class]]){
-        // 启动小程序
-        WXLaunchMiniProgramResp *launchMiniProgramResp = (WXLaunchMiniProgramResp *)resp;
-        body[@"eventType"] = @"WXLaunchMiniProgramResp";
-        ASSIGN_EMPTY_STRING(body[@"extMsg"], launchMiniProgramResp.extMsg)
-    } else if([resp isKindOfClass:[WXInvoiceAuthInsertResp class]]){
-        WXInvoiceAuthInsertResp *invoiceAuthInsertResp = (WXInvoiceAuthInsertResp *)resp;
-        body[@"eventType"] = @"WXInvoiceAuthInsertResp";
-        ASSIGN_EMPTY_STRING(body[@"wxOrderId"], invoiceAuthInsertResp.wxOrderId)
-    } else if([resp isKindOfClass:[WXNontaxPayResp class]]){
-        WXNontaxPayResp *nontaxPayResp = (WXNontaxPayResp *)resp;
-        body[@"eventType"] = @"WXNontaxPayResp";
-        ASSIGN_EMPTY_STRING(body[@"wxOrderId"], nontaxPayResp.wxOrderId)
-    } else if ([resp isKindOfClass:[WXPayInsuranceResp class]]){
-        WXPayInsuranceResp *payInsuranceResp = (WXPayInsuranceResp *)resp;
-        body[@"eventType"] = @"WXPayInsuranceResp";
-        ASSIGN_EMPTY_STRING(body[@"wxOrderId"], payInsuranceResp.wxOrderId)
-    }
-
-    [self sendEvent:body];
-}
-
-- (void)onReq:(BaseReq *)req {
-//    if ([req isKindOfClass:[GetMessageFromWXReq class]]) {
-//        GetMessageFromWXReq *getMessageReq = (GetMessageFromWXReq *)req;
-//    } else if ([req isKindOfClass:[ShowMessageFromWXReq class]]) {
-//        ShowMessageFromWXReq *showMessageReq = (ShowMessageFromWXReq *)req;
-//    } else if ([req isKindOfClass:[LaunchFromWXReq class]]) {
-//        LaunchFromWXReq *launchReq = (LaunchFromWXReq *)req;
-//    }
+    NSURL *aURL = [NSURL URLWithString:[aNotification userInfo][@"url"]];
+    return [WXApi handleOpenURL:aURL delegate:self];
 }
 
 @end

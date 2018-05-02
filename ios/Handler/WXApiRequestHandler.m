@@ -1,339 +1,160 @@
-//
-//  WXApiManager.m
-//  SDKSample
-//
-//  Created by Jeason on 15/7/14.
-//
-//
-
 #import "WXApi.h"
 #import "WXApiRequestHandler.h"
-#import "SendMessageToWXReq+requestWithTextOrMediaMessage.h"
-#import "WXMediaMessage+messageConstruct.h"
+
+#import "SendMessageToWXReq+requestWithMessage.h"
+#import "WXMediaMessage+construct.h"
 
 @implementation WXApiRequestHandler
 
-#pragma mark - Public Methods
-+ (BOOL)sendText:(NSString *)text
-         InScene:(enum WXScene)scene {
-    SendMessageToWXReq *req = [SendMessageToWXReq requestWithText:text
-                                                   OrMediaMessage:nil
-                                                            bText:YES
-                                                          InScene:scene];
-    return [WXApi sendReq:req];
-}
-
-+ (BOOL)sendImageData:(NSData *)imageData
-              TagName:(NSString *)tagName
-           MessageExt:(NSString *)messageExt
-               Action:(NSString *)action
-           ThumbImage:(UIImage *)thumbImage
-              InScene:(enum WXScene)scene {
-    WXImageObject *ext = [WXImageObject object];
-    ext.imageData = imageData;
-    
-    WXMediaMessage *message = [WXMediaMessage messageWithTitle:nil
-                                                   Description:nil
-                                                        Object:ext
-                                                    MessageExt:messageExt
-                                                 MessageAction:action
-                                                    ThumbImage:thumbImage
-                                                      MediaTag:tagName];
-    
-    SendMessageToWXReq* req = [SendMessageToWXReq requestWithText:nil
-                                                   OrMediaMessage:message
-                                                            bText:NO
-                                                          InScene:scene];
-    
-    return [WXApi sendReq:req];
-}
-
-+ (BOOL)sendLinkURL:(NSString *)urlString
-            TagName:(NSString *)tagName
-              Title:(NSString *)title
-        Description:(NSString *)description
-         ThumbImage:(UIImage *)thumbImage
-            InScene:(enum WXScene)scene {
-    WXWebpageObject *ext = [WXWebpageObject object];
-    ext.webpageUrl = urlString;
-
-    WXMediaMessage *message = [WXMediaMessage messageWithTitle:title
-                                                   Description:description
-                                                        Object:ext
-                                                    MessageExt:nil
-                                                 MessageAction:nil
-                                                    ThumbImage:thumbImage
-                                                      MediaTag:tagName];
-    
-    SendMessageToWXReq* req = [SendMessageToWXReq requestWithText:nil
-                                                   OrMediaMessage:message
-                                                            bText:NO
-                                                          InScene:scene];
-    return [WXApi sendReq:req];
-}
-
-+ (BOOL)sendMusicURL:(NSString *)musicURL
-             dataURL:(NSString *)dataURL
-               Title:(NSString *)title
-         Description:(NSString *)description
-          ThumbImage:(UIImage *)thumbImage
-             InScene:(enum WXScene)scene {
-    WXMusicObject *ext = [WXMusicObject object];
-    ext.musicUrl = musicURL;
-    ext.musicDataUrl = dataURL;
-
-    WXMediaMessage *message = [WXMediaMessage messageWithTitle:title
-                                                   Description:description
-                                                        Object:ext
-                                                    MessageExt:nil
-                                                 MessageAction:nil
-                                                    ThumbImage:thumbImage
-                                                      MediaTag:nil];
-    
-    SendMessageToWXReq* req = [SendMessageToWXReq requestWithText:nil
-                                                   OrMediaMessage:message
-                                                            bText:NO
-                                                          InScene:scene];
-    
-    return [WXApi sendReq:req];
-}
-
-+ (BOOL)sendVideoURL:(NSString *)videoURL
-               Title:(NSString *)title
-         Description:(NSString *)description
-          ThumbImage:(UIImage *)thumbImage
-             InScene:(enum WXScene)scene {
-    WXMediaMessage *message = [WXMediaMessage message];
-    message.title = title;
-    message.description = description;
-    [message setThumbImage:thumbImage];
-    
-    WXVideoObject *ext = [WXVideoObject object];
-    ext.videoUrl = videoURL;
-    
-    message.mediaObject = ext;
-    
-    SendMessageToWXReq* req = [SendMessageToWXReq requestWithText:nil
-                                                   OrMediaMessage:message
-                                                            bText:NO
-                                                          InScene:scene];
-    return [WXApi sendReq:req];
-}
-
-+ (BOOL)sendEmotionData:(NSData *)emotionData
-             ThumbImage:(UIImage *)thumbImage
-                InScene:(enum WXScene)scene {
-    WXMediaMessage *message = [WXMediaMessage message];
-    [message setThumbImage:thumbImage];
-    
-    WXEmoticonObject *ext = [WXEmoticonObject object];
-    ext.emoticonData = emotionData;
-    
-    message.mediaObject = ext;
-    
-    SendMessageToWXReq* req = [SendMessageToWXReq requestWithText:nil
-                                                   OrMediaMessage:message
-                                                            bText:NO
-                                                          InScene:scene];
-    return [WXApi sendReq:req];
-}
-
-+ (BOOL)sendFileData:(NSData *)fileData
-       fileExtension:(NSString *)extension
-               Title:(NSString *)title
-         Description:(NSString *)description
-          ThumbImage:(UIImage *)thumbImage
-             InScene:(enum WXScene)scene {
-    WXMediaMessage *message = [WXMediaMessage message];
-    message.title = title;
-    message.description = description;
-    [message setThumbImage:thumbImage];
-    
-    WXFileObject *ext = [WXFileObject object];
-    ext.fileExtension = @"pdf";
-    ext.fileData = fileData;
-    
-    message.mediaObject = ext;
-    
-    SendMessageToWXReq* req = [SendMessageToWXReq requestWithText:nil
-                                                   OrMediaMessage:message
-                                                            bText:NO
-                                                          InScene:scene];
-    return [WXApi sendReq:req];
-}
-
-+ (BOOL)sendMiniProgramWebpageUrl:(NSString *)webpageUrl
-                         userName:(NSString *)userName
-                             path:(NSString *)path
-                            title:(NSString *)title
-                      Description:(NSString *)description
-                       ThumbImage:(UIImage *)thumbImage
-                      hdImageData:(NSData *)hdImageData
-                  withShareTicket:(BOOL)withShareTicket
-                  miniProgramType:(WXMiniProgramType)programType
-                          InScene:(enum WXScene)scene
-{
-    WXMiniProgramObject *ext = [WXMiniProgramObject object];
-    ext.webpageUrl = webpageUrl;
-    ext.userName = userName;
-    ext.path = path;
-    ext.hdImageData = hdImageData;
-    ext.withShareTicket = withShareTicket;
-    ext.miniProgramType = programType;
-    
-    WXMediaMessage *message = [WXMediaMessage messageWithTitle:title
-                                                   Description:description
-                                                        Object:ext
-                                                    MessageExt:nil
-                                                 MessageAction:nil
-                                                    ThumbImage:thumbImage
-                                                      MediaTag:nil];
-    
-    SendMessageToWXReq* req = [SendMessageToWXReq requestWithText:nil
-                                                   OrMediaMessage:message
-                                                            bText:NO
-                                                          InScene:scene];
-    
-    return [WXApi sendReq:req];
-}
-
-+ (BOOL)launchMiniProgramWithUserName:(NSString *)userName
-                                 path:(NSString *)path
-                                 type:(WXMiniProgramType)miniProgramType
-{
-    WXLaunchMiniProgramReq *launchMiniProgramReq = [WXLaunchMiniProgramReq object];
-    launchMiniProgramReq.userName = userName;
-    launchMiniProgramReq.path = path;
-    launchMiniProgramReq.miniProgramType = miniProgramType;
-    
-    return  [WXApi sendReq:launchMiniProgramReq];
-}
-
-
-
-+ (BOOL)sendAppContentData:(NSData *)data
-                   ExtInfo:(NSString *)info
-                    ExtURL:(NSString *)url
-                     Title:(NSString *)title
-               Description:(NSString *)description
-                MessageExt:(NSString *)messageExt
-             MessageAction:(NSString *)action
-                ThumbImage:(UIImage *)thumbImage
-                   InScene:(enum WXScene)scene {
-    WXAppExtendObject *ext = [WXAppExtendObject object];
-    ext.extInfo = info;
-    ext.url = url;
-    ext.fileData = data;
-
-    WXMediaMessage *message = [WXMediaMessage messageWithTitle:title
-                                                   Description:description
-                                                        Object:ext
-                                                    MessageExt:messageExt
-                                                 MessageAction:action
-                                                    ThumbImage:thumbImage
-                                                      MediaTag:nil];
-    
-    SendMessageToWXReq* req = [SendMessageToWXReq requestWithText:nil
-                                                   OrMediaMessage:message
-                                                            bText:NO
-                                                          InScene:scene];
-    return [WXApi sendReq:req];
-
-}
-
-+ (BOOL)addCardsToCardPackage:(NSArray *)cardIds cardExts:(NSArray *)cardExts{
-    NSMutableArray *cardItems = [NSMutableArray array];
-    for (NSString *cardId in cardIds) {
-        WXCardItem *item = [[WXCardItem alloc] init];
-        item.cardId = cardId;
-        item.appID = @"wxf8b4f85f3a794e77";
-        [cardItems addObject:item];
-    }
-    
-    for (NSInteger index = 0; index < cardItems.count; index++) {
-        WXCardItem *item = cardItems[index];
-        NSString *ext = cardExts[index];
-        item.extMsg = ext;
-    }
-    
-    AddCardToWXCardPackageReq *req = [[AddCardToWXCardPackageReq alloc] init];
-    req.cardAry = cardItems;
-    return [WXApi sendReq:req];
-}
-
-+ (BOOL)chooseCard:(NSString *)appid
-          cardSign:(NSString *)cardSign
-          nonceStr:(NSString *)nonceStr
-          signType:(NSString *)signType
-         timestamp:(UInt32)timestamp
-{
-    WXChooseCardReq *chooseCardReq = [[WXChooseCardReq alloc] init];
-    chooseCardReq.appID = appid;
-    chooseCardReq.cardSign = cardSign;
-    chooseCardReq.nonceStr = nonceStr;
-    chooseCardReq.signType = signType;
-    chooseCardReq.timeStamp = timestamp;
-    return [WXApi sendReq:chooseCardReq];
-    
-}
-
+#pragma OAuth2
 + (BOOL)sendAuthRequestScope:(NSString *)scope
                        State:(NSString *)state
-                      OpenID:(NSString *)openID {
+{
     SendAuthReq* req = [[SendAuthReq alloc] init];
-    req.scope = scope; // @"post_timeline,sns"
+    req.scope = scope;
     req.state = state;
-    req.openID = openID;
-    
+
     return [WXApi sendReq:req];
 }
 
-+ (BOOL)openProfileWithAppID:(NSString *)appID
-                 Description:(NSString *)description
-                    UserName:(NSString *)userName
-                      ExtMsg:(NSString *)extMessage {
-    [WXApi registerApp:appID];
-    JumpToBizProfileReq *req = [[JumpToBizProfileReq alloc]init];
-    req.profileType = WXBizProfileType_Device;
-    req.username = userName;
-    req.extMsg = extMessage;
-    return [WXApi sendReq:req];
-}
-
-+ (BOOL)jumpToBizWebviewWithAppID:(NSString *)appID
-                      Description:(NSString *)description
-                        tousrname:(NSString *)tousrname
-                           ExtMsg:(NSString *)extMsg {
-    [WXApi registerApp:appID];
-    JumpToBizWebviewReq *req = [[JumpToBizWebviewReq alloc]init];
-    req.tousrname = tousrname;
-    req.extMsg = extMsg;
-    req.webType = WXMPWebviewType_Ad;
-    return [WXApi sendReq:req];
-}
-
-+ (BOOL)openUrl:(NSString *)url
+#pragma Share
++ (BOOL)sendText:(NSString *)text
+         InScene:(enum WXScene)scene
 {
-    OpenWebviewReq *req = [[OpenWebviewReq alloc] init];
-    req.url = url;
+    SendMessageToWXReq *req = [SendMessageToWXReq requestWithMessage:text
+                                                               bText:YES
+                                                             scene:scene];
+
     return [WXApi sendReq:req];
 }
 
-+ (BOOL)chooseInvoice:(NSString *)appid
-             cardSign:(NSString *)cardSign
-             nonceStr:(NSString *)nonceStr
-             signType:(NSString *)signType
-            timestamp:(UInt32)timestamp
++ (BOOL)sendImage:(NSData *)anImageData InScene:(enum WXScene)aScene
 {
-    WXChooseInvoiceReq *chooseInvoiceReq = [[WXChooseInvoiceReq alloc] init];
-    chooseInvoiceReq.appID = appid;
-    chooseInvoiceReq.cardSign = cardSign;
-    chooseInvoiceReq.nonceStr = nonceStr;
-    chooseInvoiceReq.signType = signType;
-//    chooseCardReq.cardType = @"INVOICE";
-    chooseInvoiceReq.timeStamp = timestamp;
-//    chooseCardReq.canMultiSelect = 1;
-    return [WXApi sendReq:chooseInvoiceReq];
+    WXImageObject *anImageObject = [WXImageObject object];
+    anImageObject.imageData = anImageData;
+
+    WXMediaMessage *aMediaMessage = [WXMediaMessage messageWithTitle:nil
+                                                         description:nil
+                                                           thumbData:nil
+                                                         mediaObject:anImageObject];
+
+    SendMessageToWXReq *req = [SendMessageToWXReq requestWithMessage:aMediaMessage
+                                                               bText:NO
+                                                             scene:aScene];
+
+    return [WXApi sendReq:req];
+}
+
++ (BOOL)sendMusic:(NSString *)aMusicUrl
+             musicDataUrl:(NSString *)aMusicDataUrl
+                    title:(NSString *)aTitle
+              description:(NSString *)aDescription
+               thumbImage:(NSData *)aThumbImageData
+                  InScene:(enum WXScene)aScene
+{
+    WXMusicObject *aMusicObject = [WXMusicObject object];
+    aMusicObject.musicUrl = aMusicUrl;
+    aMusicObject.musicDataUrl = aMusicDataUrl;
+
+    WXMediaMessage *aMediaMessage = [WXMediaMessage messageWithTitle:aTitle
+                                                         description:aDescription
+                                                           thumbData:aThumbImageData
+                                                         mediaObject:aMusicObject];
+
+    SendMessageToWXReq *req = [SendMessageToWXReq requestWithMessage:aMediaMessage
+                                                               bText:NO
+                                                             scene:aScene];
+
+    return [WXApi sendReq:req];
+}
+
++ (BOOL)sendVideo:(NSString *)aVideoUrl
+            title:(NSString *)aTitle
+      description:(NSString *)aDescription
+       thumbImage:(NSData *)aThumbImageData
+          InScene:(enum WXScene)aScene
+{
+    WXVideoObject *aVideoObject = [WXVideoObject object];
+    aVideoObject.videoUrl = aVideoUrl;
+
+    WXMediaMessage *aMediaMessage = [WXMediaMessage messageWithTitle:aTitle
+                                                         description:aDescription
+                                                           thumbData:aThumbImageData
+                                                         mediaObject:aVideoObject];
+
+    SendMessageToWXReq *req = [SendMessageToWXReq requestWithMessage:aMediaMessage
+                                                               bText:NO
+                                                             scene:aScene];
+
+    return [WXApi sendReq:req];
+}
+
++ (BOOL)sendLink:(NSString *)aLinkUrl
+            title:(NSString *)aTitle
+      description:(NSString *)aDescription
+       thumbImage:(NSData *)aThumbImageData
+          InScene:(enum WXScene)aScene
+{
+    WXWebpageObject *aWebpageObject = [WXWebpageObject object];
+    aWebpageObject.webpageUrl = aLinkUrl;
+
+    WXMediaMessage *aMediaMessage = [WXMediaMessage messageWithTitle:aTitle
+                                                         description:aDescription
+                                                           thumbData:aThumbImageData
+                                                         mediaObject:aWebpageObject];
+
+    SendMessageToWXReq *req = [SendMessageToWXReq requestWithMessage:aMediaMessage
+                                                               bText:NO
+                                                             scene:aScene];
+
+    return [WXApi sendReq:req];
+}
+
++ (BOOL)sendMiniProgram:(NSString *)aUserName
+        miniProgramType:(WXMiniProgramType)aMiniProgramType
+                   path:(NSString *)aPath
+           hdThumbImage:(NSData *)aHdThumbImageData
+                  title:(NSString *)aTitle
+            description:(NSString *)aDescription
+             webpageUrl:(NSString *)aWebpageUrl
+             thumbImage:(NSData *)aThumbImageData
+{
+    WXMiniProgramObject *aWXMiniProgramObject = [WXMiniProgramObject object];
+    aWXMiniProgramObject.userName = aUserName;
+    aWXMiniProgramObject.withShareTicket = YES;
+    aWXMiniProgramObject.miniProgramType = aMiniProgramType;
+    aWXMiniProgramObject.path = aPath;
+    aWXMiniProgramObject.hdImageData = aHdThumbImageData;
+    aWXMiniProgramObject.webpageUrl = aWebpageUrl;
+
+    WXMediaMessage *aMediaMessage = [WXMediaMessage messageWithTitle:aTitle
+                                                         description:aDescription
+                                                           thumbData:aThumbImageData
+                                                         mediaObject:aWXMiniProgramObject];
+
+    SendMessageToWXReq *req = [SendMessageToWXReq requestWithMessage:aMediaMessage
+                                                               bText:NO
+                                                             scene:WXSceneSession];
+
+    return [WXApi sendReq:req];
+}
+
++ (BOOL)pay:(NSString *)aPartnerId
+   prepayId:(NSString *)aPrepayId
+   nonceStr:(NSString *)aNonceStr
+  timeStamp:(UInt32)aTimeStamp
+    package:(NSString *)aPackage
+       sign:(NSString *)aSign
+{
+    PayReq *aPayReq = [PayReq new];
+    aPayReq.partnerId = aPartnerId;
+    aPayReq.prepayId = aPrepayId;
+    aPayReq.nonceStr = aNonceStr;
+    aPayReq.timeStamp = aTimeStamp;
+    aPayReq.package = aPackage;
+    aPayReq.sign = aSign;
+
+    return [WXApi sendReq:aPayReq];
 }
 
 @end

@@ -1,4 +1,5 @@
-import WXApi from './src/index'
+import * as WXApi from './src'
 
-export { WXErrCode } from './src/const'
+export { ErrCode } from './src/const'
+export { WechatError } from './src/index'
 export default WXApi
