@@ -3,6 +3,7 @@ package com.rnlib.wechat.helper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.util.Base64;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,6 +26,13 @@ public final class FormatConversion {
 
         if (isPath(string)) {
             result = BitmapFactory.decodeFile(string);
+        } else if (isBase64String(string)) {
+            String parseString = string.substring(string.indexOf(",") + 1);
+            try {
+                byte[] decodeByteArray = Base64.decode(parseString, Base64.DEFAULT);
+                result = BitmapFactory.decodeByteArray(decodeByteArray, 0, decodeByteArray.length);
+            } catch (Exception ignored) {
+            }
         } else {
             try {
                 URL url = new URL(string);
@@ -57,6 +65,10 @@ public final class FormatConversion {
 
     private static boolean isPath(String string) {
         return string.startsWith("/") || string.startsWith("file:/");
+    }
+
+    private static boolean isBase64String(String string) {
+        return string.startsWith("data:image");
     }
 
     private static Bitmap resizeBitmap(Bitmap bitmap, int newWidth, int newHeight) {
