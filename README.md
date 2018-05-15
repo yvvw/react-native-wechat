@@ -35,7 +35,7 @@ pod 'React', :path => '../node_modules/react-native', :subspecs => ['Dependency'
 
 #### 额外配置 [微信官方文档参考](https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&id=1417694084&lang=zh_CN)
 
-1. **手动配置**需要在 Linked Frameworks and Libraries 添加 libsqlite3.0
+1. **手动配置和非 Pods 管理依赖情况**需要在 Linked Frameworks and Libraries 添加 libsqlite3.0
 
 2. 在 AppDelegate.m 文件中添加下列代码
 
@@ -89,7 +89,7 @@ react-native link @yyyyu/react-native-wechat
     @Override
     protected List<ReactPackage> getPackages() {
         return Arrays.<ReactPackage>asList(
-          // other packages
+            // other packages
             new RNWechatPackage()
         );
     }
@@ -173,21 +173,34 @@ react-native link @yyyyu/react-native-wechat
 
 4. 在 AndroidManifest.xml 中注册上述 activity
 
-  ```xml
-  <application>
-    <activity
-            android:name=".wxapi.WXEntryActivity"
-            android:label="@string/app_name"
-            android:exported="true" />
-    <!-- 微信支付可选 -->
-    <activity
-            android:name=".wxapi.WXPayEntryActivity"
-            android:label="@string/app_name"
-            android:exported="true" />
-  </application>
-  ```
+    ```xml
+    <application>
+      <activity
+              android:name=".wxapi.WXEntryActivity"
+              android:label="@string/app_name"
+              android:exported="true" />
+      <!-- 微信支付可选 -->
+      <activity
+              android:name=".wxapi.WXPayEntryActivity"
+              android:label="@string/app_name"
+              android:exported="true" />
+    </application>
+    ```
 
-5. **一定要签名才能正常调用接口**，注意签名 MD5 和微信平台登记一致，调试也需要签名(微信上好像说 debug 版本可以用 debug.keystore 调试，我没有试过)
+5. **应用一定要签名才能正常调用接口**，开发时也需要签名
+
+    ```bash
+    # 微信开放平台登记的就是 keystore 的签名，使用
+
+    keytool -v -list -keystore 'you keystore' | grep MD5
+
+    # 得到 XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX
+    ```
+
+    ```javascript
+    在浏览器 console 格式化一下填到微信开放平台上
+    'XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX'.replace(/:/g, '').toLowerCase()
+    ```
 
 ## JS API
 
@@ -205,7 +218,11 @@ wechat.registerApp({ appId: 'appId' })
 2. iosOnly androidOnly 表示只有在相应平台才会生效
 3. 发送场景类型有 session (会话、聊天)  timeline (朋友圈)  favorite (收藏)，默认 session
 4. 小程序类型有 test (测试版)  preview (体验版)  release (正式版)，默认 test
-5. 图片、缩略图，可以使用原生的 path 或 uri (第三方库 [react-native-camera](https://github.com/react-native-community/react-native-camera)、[react-native-image-picker](https://github.com/react-community/react-native-image-picker) 返回值)，也可以使用 react native 的 require('image.png')，还可以使用 base64(安卓未测试)
+5. 图片、缩略图以下 4 种方式均可
+  - local 资源 e.g. require('image.png')
+  - base64 e.g. data:image/png;base64,...
+  - 原生 path uri 路径字符串 (第三方库 [react-native-camera](https://github.com/react-native-community/react-native-camera)、[react-native-image-picker](https://github.com/react-community/react-native-image-picker) 等返回值)
+  - 网络 uri e.g. https://reactjs.org/logo-og.png
 
 ### 返回值说明
 
