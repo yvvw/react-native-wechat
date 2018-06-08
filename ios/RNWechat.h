@@ -12,10 +12,6 @@
 #import "WXApi.h"
 #import "WXApiRequestHandler.h"
 
-#define RNWechatEventName @"RNWechatEvent"
-
-static NSString *const kOpenURLNotification = @"RCTOpenURLNotification";
-
 @interface RNWechat : RCTEventEmitter <RCTBridgeModule, WXApiDelegate>
 
 @end

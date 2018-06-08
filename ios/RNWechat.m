@@ -8,6 +8,10 @@ if (string != nil) { \
     assign = @""; \
 }
 
+#define RNWechatEventName @"RNWechatEvent"
+
+static NSString *const kOpenURLNotification = @"RCTOpenURLNotification";
+
 @implementation RNWechat {
     BOOL _isWXApiRegisteSuccess;
 }
