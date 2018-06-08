@@ -199,6 +199,7 @@ react-native link @yyyyu/react-native-wechat
 
     ```javascript
     在浏览器 console 格式化一下填到微信开放平台上
+
     'XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX'.replace(/:/g, '').toLowerCase()
     ```
 
@@ -219,10 +220,11 @@ wechat.registerApp({ appId: 'appId' })
 3. 发送场景类型有 session (会话、聊天)  timeline (朋友圈)  favorite (收藏)，默认 session
 4. 小程序类型有 test (测试版)  preview (体验版)  release (正式版)，默认 test
 5. 图片、缩略图以下 4 种方式均可
-  - local 资源 e.g. require('image.png')
-  - base64 e.g. data:image/png;base64,...
-  - 原生 path uri 路径字符串 (第三方库 [react-native-camera](https://github.com/react-native-community/react-native-camera)、[react-native-image-picker](https://github.com/react-community/react-native-image-picker) 等返回值)
-  - 网络 uri e.g. https://reactjs.org/logo-og.png
+    - local 资源 e.g. require('image.png')
+    - base64 e.g. data:image/png;base64,...
+    - 原生 path uri 路径字符串 (第三方库 [react-native-camera](https://github.com/react-native-community/react-native-camera)、[react-native-image-picker](https://github.com/react-community/react-native-image-picker) 等返回值)
+    - 网络 uri e.g. https://reactjs.org/logo-og.png
+6. 微信 SDK 限制: 标题文字大小不能超过 **512B**、描述文字大小不能超过 **1KB**、缩略图大小不能超过 **32KB**, 超过限制报错 **RequestFailed**
 
 ### 返回值说明
 
