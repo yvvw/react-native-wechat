@@ -315,6 +315,10 @@ export class WechatError extends Error {
     this.errCode = errCode
     this.errMsg = errMsg
 
-    Object.setPrototypeOf(this, WechatError.prototype)
+    if (typeof Object.setPrototypeOf === 'function') {
+      Object.setPrototypeOf(this, WechatError.prototype)
+    } else {
+      this.__proto__ = WechatError.prototype
+    }
   }
 }
