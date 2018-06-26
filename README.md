@@ -32,10 +32,11 @@ pod 'React', :path => '../node_modules/react-native', :subspecs => ['Dependency'
 
 1. 使用 Xcode 打开项目，在项目依赖目录(Libraries)下添加 node_modules 中的 @yyyyu/react-native-wechat 项目
 2. 在 Linked Frameworks and Libraries 添加 libRNWechat.a
+![Add code](doc/images/add-library-ios.png)
 
 #### 额外配置 [微信官方文档参考](https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list&id=1417694084&lang=zh_CN)
 
-1. **手动配置和非 Pods 管理依赖情况**需要在 Linked Frameworks and Libraries 添加 libsqlite3.0
+1. **手动配置和非 Pods 管理依赖情况**需要在 Linked Frameworks and Libraries 添加 libsqlite3.0 (方法同上)
 
 2. 在 AppDelegate.m 文件中添加下列代码
 
@@ -47,13 +48,14 @@ pod 'React', :path => '../node_modules/react-native', :subspecs => ['Dependency'
       return [RCTLinkingManager application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
     }
     ```
+    ![Add libRNWechat.a](doc/images/add-code-ios.png)
 
 3. 在 Info.plist 文件中添加 URL Schemes
 
    - identifier -> weixin
    - URL Schemes -> **你的 appId**
 
-4. ​在 Info.plist 文件添加 LSApplicationQueriesSchemes 字段，值类型为 Array，添加字符串子元素 weixin
+4. ​在 Info.plist 文件添加 LSApplicationQueriesSchemes 字段，值类型为 Array，添加字符串子元素 weixin ![Add code](doc/images/add-scheme-ios.png)
 
 ### android
 
@@ -116,6 +118,7 @@ react-native link @yyyyu/react-native-wechat
         }
     }
     ```
+    ![Add code](doc/images/add-code-activity-android.png)
 
 2. 在应用包名下创建 wxapi 这个包，并新建 WXEntryActivity 类(这里要严格按照这种形式创建，否则无法接收到微信的应答)
 
@@ -148,6 +151,7 @@ react-native link @yyyyu/react-native-wechat
         }
     }
     ```
+    ![Add code](doc/images/add-code-wechat-android.png)
 
 3. 如果需要使用微信支付功能，在 wxapi 这个包下新建 WXPayEntryActivity 类(注意此处类名和上面不同)
 
@@ -186,6 +190,7 @@ react-native link @yyyyu/react-native-wechat
               android:exported="true" />
     </application>
     ```
+    ![Add code](doc/images/add-code-manifest-android.png)
 
 5. **应用一定要签名才能正常调用接口**，开发时也需要签名
 
@@ -202,6 +207,7 @@ react-native link @yyyyu/react-native-wechat
 
     'XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX'.replace(/:/g, '').toLowerCase()
     ```
+    ![Add code](doc/images/sign-android.png)
 
 ## JS API
 
@@ -212,6 +218,7 @@ wechat.registerApp({ appId: 'appId' })
   .then(res => { console.log(res) })
   .catch(err => { console.error(err) })
 ```
+![Add code](doc/images/code.png)
 
 ### 参数说明
 
@@ -243,7 +250,7 @@ wechat.registerApp({ appId: 'appId' })
       SentFail: -3,      // 发送失败
       AuthDeny: -4,      // 授权失败
       Unsupport: -5,     // 不支持
-      Ban: -6,           // 禁止 androidOnly
+      Ban: -6,           // 禁止(签名信息不正确时会出现这个错误) androidOnly
       // 自定义错误类型
       ActiveSuccess: 1,  // 发送请求后通过系统唤起(任务列表选择唤起)，无法判断成功失败
       RequestFailed: -7, // 请求失败
