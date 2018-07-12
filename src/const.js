@@ -56,6 +56,7 @@ export const WXMiniProgramTypes = {
  */
 export const WXRespType = {
   Auth: 'SendAuthResp',
+  LaunchMiniProgram: 'WXLaunchMiniProgramResp',
   Message: 'SendMessageToWXResp',
   Pay: 'PayResp'
 }

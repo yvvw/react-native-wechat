@@ -17,6 +17,7 @@ import com.rnlib.wechat.helper.SendMessageToWXHelper;
 import com.rnlib.wechat.helper.WXMediaMessageHelper;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
+import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.opensdk.modelmsg.WXImageObject;
@@ -131,6 +132,24 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void openWXApp(Promise promise) {
         promise.resolve(api.openWXApp());
+    }
+
+    /**
+     * 打开小程序
+     */
+    @ReactMethod
+    public void launchMiniProgram(
+            String userName,
+            String path,
+            Integer miniprogramType,
+            Promise promise) {
+
+        final WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
+        req.userName = userName;
+        req.path = path;
+        req.miniprogramType = miniprogramType;
+
+        promise.resolve(api.sendReq(req));
     }
 
     /**
@@ -346,6 +365,11 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
                 if (baseResp instanceof SendMessageToWX.Resp) {
                     // 分享
                     body.putString("eventType", "SendMessageToWXResp");
+                } else if (baseResp instanceof WXLaunchMiniProgram.Resp) {
+                    // 打开小程序
+                    WXLaunchMiniProgram.Resp resp = (WXLaunchMiniProgram.Resp) baseResp;
+                    body.putString("eventType", "WXLaunchMiniProgramResp");
+                    body.putString("extMsg", resp.extMsg);
                 } else if (baseResp instanceof SendAuth.Resp) {
                     // OAuth2
                     SendAuth.Resp resp = (SendAuth.Resp) baseResp;

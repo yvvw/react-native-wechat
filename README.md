@@ -314,6 +314,16 @@ wechat.getWXAppInstallUrl()
 wechat.openWXApp()
 ```
 
+#### launchMiniProgram 打开小程序(安卓需要先注册 api 才可以调用)
+
+```javascript
+wechat.launchMiniProgram({
+  username: 'you username', // 原始 id，微信开放平台注册小程序处获取
+  path: '/path1/path2', // 小程序路由地址
+  type: 'test' // 小程序类型 optional('release')
+})
+```
+
 #### sendAuthRequest OAuth2 微信登录
 
 ```javascript

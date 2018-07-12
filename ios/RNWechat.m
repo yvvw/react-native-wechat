@@ -118,6 +118,18 @@ RCT_REMAP_METHOD(openWXApp,
     resolve([self getResolveResFromBool:[WXApi openWXApp]]);
 }
 
+RCT_REMAP_METHOD(launchMiniProgram,
+    launchMiniProgramWithUserName:(NSString *)anUserName
+                             path:(NSString *)aPath
+                  miniProgramType:(NSInteger *)aMiniProgramType
+                         resolver:(RCTPromiseResolveBlock)resolve
+                         rejecter:(RCTPromiseRejectBlock)reject)
+{
+    resolve([self getResolveResFromBool:[WXApiRequestHandler launchMiniProgramWithUserName:anUserName
+                                                                                      path:aPath
+                                                                            miniProgramType:(WXMiniProgramType)aMiniProgramType]]);
+}
+
 
 #pragma OAuth2
 
@@ -272,6 +284,11 @@ RCT_REMAP_METHOD(pay,
         ASSIGN_EMPTY_STRING(body[@"state"], authResp.state)
         ASSIGN_EMPTY_STRING(body[@"lang"], authResp.lang)
         ASSIGN_EMPTY_STRING(body[@"country"], authResp.country)
+    } else if ([resp isKindOfClass:[WXLaunchMiniProgramResp class]]) {
+        // 启动小程序
+        WXLaunchMiniProgramResp *miniProgramResp = (WXLaunchMiniProgramResp *)resp;
+        body[@"eventType"] = @"WXLaunchMiniProgramResp";
+        ASSIGN_EMPTY_STRING(body[@"extMsg"], miniProgramResp.extMsg);
     } else if ([resp isKindOfClass:[SendMessageToWXResp class]]) {
         // 发送文字、图片、音乐、视频、链接、小程序
         SendMessageToWXResp *messageResp = (SendMessageToWXResp *)resp;

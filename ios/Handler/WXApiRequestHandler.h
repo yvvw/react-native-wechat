@@ -5,6 +5,10 @@
 + (BOOL)sendAuthRequestScope:(NSString *)scope
                        State:(NSString *)state;
 
++ (BOOL)launchMiniProgramWithUserName:(NSString *)anUserName
+                             path:(NSString *)aPath
+                  miniProgramType:(WXMiniProgramType)aMiniProgramType;
+
 + (BOOL)sendText:(NSString *)text
          InScene:(enum WXScene)scene;
 

@@ -17,6 +17,19 @@
     return [WXApi sendReq:req];
 }
 
+#pragma Other
++ (BOOL)launchMiniProgramWithUserName:(NSString *)anUserName
+                                 path:(NSString *)aPath
+                      miniProgramType:(WXMiniProgramType)aMiniProgramType
+{
+    WXLaunchMiniProgramReq *req = [WXLaunchMiniProgramReq object];
+    req.userName = anUserName;
+    req.path = aPath;
+    req.miniProgramType = aMiniProgramType;
+
+    return [WXApi sendReq:req];
+}
+
 #pragma Share
 + (BOOL)sendText:(NSString *)text
          InScene:(enum WXScene)scene

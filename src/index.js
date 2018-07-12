@@ -41,6 +41,27 @@ export const openWXApp = async () => {
 }
 
 /**
+ * 打开小程序
+ * @param  {String}                         username          小程序原始 id
+ * @param  {String}                         path              小程序页面路径
+ * @param  {'test' | 'preview' | 'release'} [type='release'}] 小程序类型
+ * @return {Boolean}
+ */
+export const launchMiniProgram = async ({
+  username,
+  path,
+  type = 'release'
+}) => {
+  if (Platform.OS === 'android') {
+    await checkWechatModuleIsEnable()
+  }
+  if (
+    !await RNWechat.launchMiniProgram(username, path, getWXMiniProgramType(type))
+  ) throw new WechatError(Errors.RequestFailed)
+  return listenAndHandleWechatResponse(WXRespType.LaunchMiniProgram)
+}
+
+/**
  * 授权
  * @desc 只有 snsapi_userinfo scope 有效
  *       是的，你没看错，不需要 appid，微信文档太久不更新了
