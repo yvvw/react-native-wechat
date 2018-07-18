@@ -179,7 +179,7 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
 
         WXTextObject textObject = new WXTextObject(text);
 
-        WXMediaMessage mediaMessage = WXMediaMessageHelper.getInstance(null, null, null, textObject);
+        WXMediaMessage mediaMessage = WXMediaMessageHelper.getInstance(null, text, null, textObject);
 
         SendMessageToWX.Req req = SendMessageToWXHelper.getInstance(mediaMessage, sceneType);
 
