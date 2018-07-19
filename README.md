@@ -334,8 +334,6 @@ wechat.sendAuthRequest({
 
 #### sendText 发送文字
 
-安卓版本分享到会话无法使用，不知道是不是我自己的问题
-
 ```javascript
 wechat.sendText({
   text: 'text', // 用于发送的文字
