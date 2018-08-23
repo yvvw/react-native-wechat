@@ -402,7 +402,7 @@ wechat.sendMiniProgram({
 })
 ```
 
-#### pay 支付(没有账号，未测试)
+#### pay 支付
 
 ```javascript
 wechat.pay({
