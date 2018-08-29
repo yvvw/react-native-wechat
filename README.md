@@ -195,18 +195,16 @@ react-native link @yyyyu/react-native-wechat
 5. **应用一定要签名才能正常调用接口**，开发时也需要签名
 
     ```bash
-    # 微信开放平台登记的就是 keystore 的签名，使用
+    # macOS 下使用
 
-    keytool -v -list -keystore 'you keystore' | grep MD5
+    keytool -v -list -keystore 'keystore file path' \
+    | grep MD5 \
+    | { read s; echo "${s//:/}" } \
+    | tr '[:upper:]' '[:lower:]'
 
-    # 得到 XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX
+    # 获取 keystore 签名信息 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 填写到微信开放平台上
     ```
 
-    ```javascript
-    在浏览器 console 格式化一下填到微信开放平台上
-
-    'XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX:XX'.replace(/:/g, '').toLowerCase()
-    ```
     ![Add code](doc/images/sign-android.png)
 
 ## JS API
