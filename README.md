@@ -1,5 +1,8 @@
 # react-native-wechat
 
+- iOS SDK VERSION 1.8.3
+- Android SDK VERSION 5.1.6
+
 ## 安装
 
 ```bash
@@ -292,9 +295,9 @@ wechat.registerApp({
 wechat.isWXAppInstalled()
 ```
 
-#### isWXAppSupportApi 检测当前版本微信是否支持 Api
+#### isWXAppSupportApi 检测当前版本微信是否支持 Api iosOnly
 
-```javascript
+```javascript 
 // @return Boolean
 wechat.isWXAppSupportApi()
 ```

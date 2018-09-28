@@ -19,10 +19,13 @@ export const registerApp = ({ appId, isDebug = false }) => {
 export const isWXAppInstalled = () => RNWechat.isWXAppInstalled()
 
 /**
- * 当前版本微信是否支持 OpenApi
+ * 当前版本微信是否支持 OpenApi iosOnly
  * @return {Boolean}
  */
-export const isWXAppSupportApi = () => RNWechat.isWXAppSupportApi()
+export const isWXAppSupportApi = () => {
+  // Android 5.1.6 版本 SDK 移除了该方法
+  return Platform.OS === 'ios' ? RNWechat.isWXAppSupportApi() : true
+}
 
 /**
  * 获取微信的itunes安装地址 iosOnly

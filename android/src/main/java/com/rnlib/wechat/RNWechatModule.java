@@ -119,14 +119,6 @@ public class RNWechatModule extends ReactContextBaseJavaModule {
     }
 
     /**
-     * 安装版本微信是否支持 api
-     */
-    @ReactMethod
-    public void isWXAppSupportApi(Promise promise) {
-        promise.resolve(api.isWXAppSupportAPI());
-    }
-
-    /**
      * 打开微信
      */
     @ReactMethod
