@@ -16,4 +16,5 @@ Pod::Spec.new do |s|
   s.platform      = :ios, '8.0'
   s.source_files  = 'ios/RNWechat.{h,m}', 'ios/Handler/*.{h,m}', 'ios/Helper/*.{h,m}'
   s.dependency 'WechatOpenSDK', '= 1.8.3'
+  s.dependency "React"
 end
