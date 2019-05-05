@@ -124,7 +124,7 @@ export function sendLink(options: { link: string; title: string; desc: string; t
  * @param  {'test' | 'preview' | 'release'} [type='release'] 小程序类型
  * @return {Object}
  */
-export function sendLink(options: { username: string; path: string; hdThumb: string; title: string; desc: string; link: string; thumb: string; type?: 'test' | 'preview' | 'release'; }): Promise<IResults>;
+export function sendMiniProgram(options: { username: string; path: string; hdThumb: string; title: string; desc: string; link: string; thumb: string; type?: 'test' | 'preview' | 'release'; }): Promise<IResults>;
 
 /**
  * 支付
