@@ -1,35 +1,50 @@
 {
   "name": "@yyyyu/react-native-wechat",
-  "author": "yyyyu <g592842897@gmail.com>",
-  "version": "2.2.0",
+  "version": "0.0.0-development",
+  "description": "wechat api for react native.",
   "keywords": [
     "react-native",
-    "wechat"
+    "wechat",
+    "weixin"
   ],
-  "description": "react native for wechat.",
-  "license": "MIT",
   "homepage": "https://github.com/yyyyu/react-native-wechat",
+  "bugs": {
+    "url": "https://github.com/yyyyu/react-native-wechat/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "yyyyu",
+    "email": "g592842897@gmail.com"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:yyyyu/react-native-wechat.git"
+    "url": "https://github.com/yyyyu/react-native-wechat.git"
   },
-  "main": "index.js",
   "scripts": {
-    "postinstall": "node scripts/postinstall"
+    "test": "echo ignore",
+    "build": "tsc",
+    "lint": "tslint --fix src/**/*.ts",
+    "commit": "git-cz",
+    "semantic-release": "semantic-release"
   },
-  "rnpm": {
-    "commands": {
-      "postlink": "node node_modules/@yyyyu/react-native-wechat/scripts/postlink"
-    }
-  },
-  "peerDependencies": {
-    "react-native": ">0.50.0"
+  "dependencies": {
+    "@types/react-native": "^0.57.45"
   },
   "devDependencies": {
-    "babel-eslint": "^8.2.3",
-    "standard": "^11.0.1"
+    "commitizen": "^3.1.1",
+    "cz-conventional-changelog": "^2.1.0",
+    "semantic-release": "^15.13.12",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.3"
   },
-  "standard": {
-    "parser": "babel-eslint"
+  "peerDependencies": {
+    "react-native": "^0.59.5"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
