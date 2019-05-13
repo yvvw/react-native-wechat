@@ -62,16 +62,16 @@ function parseSendMessageOption(o) {
     if (typeof o.messageType !== "number") {
         throwError(Errors.InvokeFailed, `Expected messageType is number, but get ${o.messageType}.`);
     }
-    if (typeof o.messageThumb !== undefined) {
+    if (o.messageThumb !== undefined) {
         option.messageThumb = resolveImage(o.messageThumb);
     }
     // @ts-ignore
-    if (typeof o.image !== undefined) {
+    if (o.image !== undefined) {
         // @ts-ignore
         option.image = resolveImage(o.image);
     }
     // @ts-ignore
-    if (typeof o.hdImage !== undefined) {
+    if (o.hdImage !== undefined) {
         // @ts-ignore
         option.hdImage = resolveImage(o.hdImage);
     }
@@ -113,12 +113,12 @@ function parseSendMessageRespOption(o) {
         throwError(Errors.InvokeFailed, `Expected messageType is number, but get ${o.messageType}.`);
     }
     // @ts-ignore
-    if (typeof o.image !== undefined) {
+    if (o.image !== undefined) {
         // @ts-ignore
         option.image = resolveImage(o.image);
     }
     // @ts-ignore
-    if (typeof o.hdImage !== undefined) {
+    if (o.hdImage !== undefined) {
         // @ts-ignore
         option.hdImage = resolveImage(o.hdImage);
     }
