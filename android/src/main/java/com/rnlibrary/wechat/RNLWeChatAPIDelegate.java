@@ -11,6 +11,7 @@ import com.tencent.mm.opensdk.modelbiz.OpenWebview;
 import com.tencent.mm.opensdk.modelbiz.SubscribeMessage;
 import com.tencent.mm.opensdk.modelbiz.SubscribeMiniProgramMsg;
 import com.tencent.mm.opensdk.modelbiz.WXInvoiceAuthInsert;
+import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
 import com.tencent.mm.opensdk.modelbiz.WXNontaxPay;
 import com.tencent.mm.opensdk.modelbiz.WXOpenBusinessView;
 import com.tencent.mm.opensdk.modelbiz.WXOpenBusinessWebview;
@@ -175,9 +176,12 @@ public class RNLWeChatAPIDelegate implements IWXAPIEventHandler {
         }
 
         // mini program
-        else if (baseResp instanceof LaunchFromWX.Resp) {
-            LaunchFromWX.Resp resp = (LaunchFromWX.Resp) baseResp;
-            name = LaunchFromWX.Req.class.getName();
+        else if (baseResp instanceof WXLaunchMiniProgram.Resp) {
+            WXLaunchMiniProgram.Resp resp = (WXLaunchMiniProgram.Resp) baseResp;
+            name = WXLaunchMiniProgram.Req.class.getName();
+            if (success) {
+                payload.putString("ext", resp.extMsg);
+            }
         } else if (baseResp instanceof SubscribeMiniProgramMsg.Resp) {
             SubscribeMiniProgramMsg.Resp resp = (SubscribeMiniProgramMsg.Resp) baseResp;
             name = SubscribeMiniProgramMsg.Req.class.getName();
