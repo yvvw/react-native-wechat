@@ -28,8 +28,6 @@ import java.net.URLConnection;
 import javax.annotation.Nullable;
 
 class RNLWeChatAPIObjectConvert {
-    static private int WX_FILE_PATH_LIMIT = 10240;
-
     static WritableMap cardItemFromWXO(AddCardToWXCardPackage.WXCardItem cardItem) {
         WritableMap message = Arguments.createMap();
         message.putString("id", cardItem.cardId);
@@ -155,11 +153,7 @@ class RNLWeChatAPIObjectConvert {
 
     static WXImageObject imageToWXO(Context context, ReadableMap data) throws Exception {
         WXImageObject object = new WXImageObject();
-        String str = data.getString("image");
-        if (str.length() < WX_FILE_PATH_LIMIT) {
-            object.imagePath = str;
-        }
-        object.imageData = parseFileStr(context, str);
+        object.imageData = parseFileStr(context, data.getString("image"));
         return object;
     }
 
@@ -204,11 +198,7 @@ class RNLWeChatAPIObjectConvert {
 
     static WXFileObject fileToWXO(Context context, ReadableMap data) throws Exception {
         WXFileObject object = new WXFileObject();
-        String str = data.getString("file");
-        if (str.length() < WX_FILE_PATH_LIMIT) {
-            object.filePath = str;
-        }
-        object.fileData = parseFileStr(context, str);
+        object.fileData = parseFileStr(context, data.getString("file"));
         return object;
     }
 
@@ -254,11 +244,7 @@ class RNLWeChatAPIObjectConvert {
 
     static WXAppExtendObject appExtendToWXO(Context context, ReadableMap data) throws Exception {
         WXAppExtendObject object = new WXAppExtendObject();
-        String str = data.getString("file");
-        if (str.length() < WX_FILE_PATH_LIMIT) {
-            object.filePath = str;
-        }
-        object.fileData = parseFileStr(context, str);
+        object.fileData = parseFileStr(context, data.getString("file"));
         object.extInfo = data.getString("ext");
         return object;
     }
@@ -274,11 +260,7 @@ class RNLWeChatAPIObjectConvert {
 
     static WXEmojiObject emoticonToWXO(Context context, ReadableMap data) throws Exception {
         WXEmojiObject object = new WXEmojiObject();
-        String str = data.getString("image");
-        if (str.length() < WX_FILE_PATH_LIMIT) {
-            object.emojiPath = str;
-        }
-        object.emojiData = parseFileStr(context, str);
+        object.emojiData = parseFileStr(context, data.getString("image"));
         return object;
     }
 
