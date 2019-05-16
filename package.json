@@ -17,7 +17,7 @@
     "email": "g592842897@gmail.com"
   },
   "main": "dist/index.js",
-  "types": "dist/index.d.js",
+  "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/yyyyu/react-native-wechat.git"
