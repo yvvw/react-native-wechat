@@ -12,7 +12,7 @@ export function OAuth2(option) {
 const defaultOption = {
     scope: OAuth2Scope.UserInfo,
     state: "",
-    supportWeb: false,
+    fallback: false,
 };
 function parseOption(o) {
     const option = Object.assign({}, defaultOption);
@@ -22,8 +22,8 @@ function parseOption(o) {
     if (typeof o.state === "string") {
         option.state = o.state;
     }
-    if (typeof o.supportWeb === "boolean") {
-        option.supportWeb = o.supportWeb;
+    if (typeof o.fallback === "boolean") {
+        option.fallback = o.fallback;
     }
     return option;
 }

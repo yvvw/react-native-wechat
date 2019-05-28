@@ -1,6 +1,6 @@
 # react-native-wechat
 
-[WeChat SDK](https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list) [![npm version](https://badge.fury.io/js/%40yyyyu%2Freact-native-wechat.svg)](https://www.npmjs.com/package/@yyyyu/react-native-wechat)
+[WeChat SDK](https://open.weixin.qq.com/cgi-bin/showdocument?action=dir_list) [![npm version](https://badge.fury.io/js/%40yyyyu%2Freact-native-wechat.svg)](https://www.npmjs.com/package/@yyyyu/react-native-wechat) [![Build Status](https://travis-ci.org/yyyyu/react-native-wechat.svg?branch=master)](https://travis-ci.org/yyyyu/react-native-wechat)
 
 **SDK Version**
 iOS 1.8.4
@@ -9,6 +9,8 @@ Android 5.3.1
 **Environment**
 Xcode 10.2.1
 react-native 0.59.5
+
+## [Example](example/App.js)
 
 ## Getting Started
 
@@ -147,7 +149,7 @@ RNWechat.getSDKVersion()
 interface IAuthOption {
   state: string;
   scope?: AuthScope;
-  supportWeb?: boolean;
+  fallback?: boolean;
 }
 RNWechat.auth({
   state: "",

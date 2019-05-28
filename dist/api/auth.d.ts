@@ -2,7 +2,7 @@ import { PromiseResult } from "../module";
 export interface IAuthOption {
     scope?: AuthScope;
     state: string;
-    supportWeb?: boolean;
+    fallback?: boolean;
 }
 export declare enum AuthScope {
     UserInfo = "snsapi_userinfo"

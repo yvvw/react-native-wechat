@@ -71,7 +71,7 @@ export default class App extends Component {
       // interface IAuthOption {
       //   state: string;
       //   scope?: AuthScope;
-      //   supportWeb?: boolean;
+      //   fallback?: boolean;
       // }
       console.log("invoke auth");
       console.log(
