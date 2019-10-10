@@ -65,7 +65,7 @@ weixin
 ```txt
 // Copy this
 WXEntryActivity
-WXPayEntryActivity
+WXPayEntryActivity // content is same as WXEntryActivity
 ```
 
 ```java
